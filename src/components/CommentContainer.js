@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
-import SnackbarContent from '@material-ui/core/SnackbarContent';
+import TextInput from "./TextInput";
+import Comment from "./Comment";
 
-const action = (
-    <Button color="secondary" size="small">
-        lorem ipsum dolorem
-    </Button>
-);
 
 const styles = theme => ({
     snackbar: {
@@ -19,27 +14,29 @@ const styles = theme => ({
 function LongTextSnackbar(props) {
     const { classes } = props;
 
+
     return (
         <div>
-            <SnackbarContent className={classes.snackbar} message="I love snacks."/>
-            <SnackbarContent
+            <Comment className={classes.snackbar} message="I love snacks."/>
+            <Comment
                 className={classes.snackbar}
                 message={
                     'I love candy. I love cookies. I love cupcakes. \
                     I love cheesecake. I love chocolate.'
                 }
             />
-            <SnackbarContent
+            <Comment
                 className={classes.snackbar}
                 message="I love candy. I love cookies. I love cupcakes."
             />
-            <SnackbarContent
+            <Comment
                 className={classes.snackbar}
                 message={
                     'I love candy. I love cookies. I love cupcakes. \
-                    I love cheesecake. I love chocolate.'
+                    I love cheesecake. I love chocolate.....................................'
                 }
             />
+            <TextInput/>
         </div>
     );
 }

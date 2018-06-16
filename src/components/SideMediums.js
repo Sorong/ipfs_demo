@@ -3,12 +3,14 @@ import {withStyles} from '@material-ui/core/styles';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
 import Search from "./Search"
+import UploadArea from "./UploadArea";
+import {Button} from "@material-ui/core/es/index";
 
 const styles = theme => ({
     root: {
         display: 'flex',
         flexWrap: 'wrap',
-        minWidth: 300,
+        minWidth: 200,
         width: '100%',
     },
     image: {
@@ -78,6 +80,9 @@ const styles = theme => ({
         left: 'calc(50% - 9px)',
         transition: theme.transitions.create('opacity'),
     },
+    button: {
+        marginTop: theme.spacing.unit,
+    },
 });
 
 
@@ -107,7 +112,9 @@ class SideMediums extends React.Component {
 
         return (
             <div className={classes.root}>
+                <UploadArea/>
                 <Search/>
+
                 {images.map(image => (
                     <ButtonBase
                         focusRipple
@@ -140,6 +147,9 @@ class SideMediums extends React.Component {
           </span>
                     </ButtonBase>
                 ))}
+                <Button variant="contained" className={classes.button} fullWidth>
+                    More
+                </Button>
             </div>
         );
     }

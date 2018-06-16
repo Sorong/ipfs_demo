@@ -28,6 +28,7 @@ const styles = theme => ({
     appBar: {
         position: 'absolute',
         marginLeft: drawerWidth,
+        //backgroundColor: "black",
         [theme.breakpoints.up('md')]: {
             width: `calc(100% - ${drawerWidth}px)`,
         },
@@ -139,9 +140,9 @@ class ResponsiveDrawer extends React.Component {
                 </Hidden>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
-                    <MainMedium path={this.state.medium} type={this.state.type}/>,
-                    <Tags></Tags>
-                    <CommentContainer></CommentContainer>
+                    <MainMedium path={this.state.medium} type={this.state.type}/>
+                    <Tags/>
+                    <CommentContainer/>
                 </main>
 
             </div>

@@ -5,6 +5,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import TagFacesIcon from '@material-ui/icons/TagFaces';
+import TextInput from "./TextInput";
 
 const styles = theme => ({
     root: {
@@ -29,18 +30,6 @@ class ChipsArray extends React.Component {
         ],
     };
 
-    handleDelete = data => () => {
-        if (data.label === 'React') {
-            alert('Why would you want to delete React?! :)'); // eslint-disable-line no-alert
-            return;
-        }
-
-        const chipData = [...this.state.chipData];
-        const chipToDelete = chipData.indexOf(data);
-        chipData.splice(chipToDelete, 1);
-        this.setState({ chipData });
-    };
-
     render() {
         const { classes } = this.props;
 
@@ -62,11 +51,12 @@ class ChipsArray extends React.Component {
                             key={data.key}
                             avatar={avatar}
                             label={data.label}
-                            onDelete={this.handleDelete(data)}
+                            //onClick={this.handleDelete(data)}
                             className={classes.chip}
                         />
                     );
                 })}
+                <TextInput type="add"/>
             </Paper>
         );
     }

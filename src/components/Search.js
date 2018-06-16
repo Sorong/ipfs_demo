@@ -3,12 +3,8 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import {TextField} from "@material-ui/core/es/index";
-import Delete from "@material-ui/icons/es/Delete";
 import Search from "@material-ui/icons/es/Search";
 
 const styles = {
@@ -24,10 +20,9 @@ const styles = {
     },
     search: {
         position: "absolute",
+        backgroundColor: "white"
     },
-    button: {
-
-    },
+    button: {},
     text: {
         color: "white !important"
     }
@@ -49,7 +44,7 @@ class SearchBar extends React.Component {
     render() {
         const { classes } = this.props;
         return (
-            <div className={classes.root}>
+            <div>
                 <AppBar className={classes.search}>
                     <Toolbar>
                         <TextField
