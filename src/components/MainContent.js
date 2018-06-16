@@ -108,7 +108,6 @@ class ResponsiveDrawer extends React.Component {
                         <Typography variant="title" color="inherit" noWrap>
                             IPFS-Imagehoster
                         </Typography>
-                        <IconButton/>
                     </Toolbar>
                 </AppBar>
                 <Hidden mdUp>

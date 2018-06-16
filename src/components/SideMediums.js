@@ -2,6 +2,7 @@ import React from 'react';
 import {withStyles} from '@material-ui/core/styles';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
+import Search from "./Search"
 
 const styles = theme => ({
     root: {
@@ -104,6 +105,7 @@ class SideMediums extends React.Component {
 
         return (
             <div className={classes.root}>
+                <Search/>
                 {images.map(image => (
                     <ButtonBase
                         focusRipple
