@@ -11,7 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import MainMedium from "./MainMedium";
 import ImageButtons from "./SideMediums";
 import Tags from "./Tags";
-import Search from "./Search";
+import CommentContainer from "./CommentContainer";
 
 const drawerWidth = 250;
 
@@ -139,8 +139,9 @@ class ResponsiveDrawer extends React.Component {
                 </Hidden>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
-                    <MainMedium path={this.state.medium} type={this.state.type}/>
+                    <MainMedium path={this.state.medium} type={this.state.type}/>,
                     <Tags></Tags>
+                    <CommentContainer></CommentContainer>
                 </main>
 
             </div>

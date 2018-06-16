@@ -45,12 +45,14 @@ const styles = theme => ({
     },
     imageSrc: {
         position: 'absolute',
-        margin: "1%",
+        margin: "0%",
         left: 0,
         right: 0,
         top: 0,
         bottom: 0,
         backgroundSize: 'cover',
+        borderColor: 'black',
+        border: 'solid',
         backgroundPosition: 'center 40%',
     },
     imageBackdrop: {
