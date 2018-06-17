@@ -5,6 +5,9 @@
   "dependencies": {
     "@material-ui/core": "^1.2.1",
     "@material-ui/icons": "^1.1.0",
+    "ipfs": "^0.29.3",
+    "orbit-db": "^0.19.8",
+    "prop-types": "latest",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-dropzone": "^4.2.11",

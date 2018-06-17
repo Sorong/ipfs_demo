@@ -12,6 +12,7 @@ import MainMedium from "./MainMedium";
 import ImageButtons from "./SideMediums";
 import Tags from "./Tags";
 import CommentContainer from "./CommentContainer";
+import Database from "../logic/Database";
 
 const drawerWidth = 250;
 
@@ -53,6 +54,7 @@ const styles = theme => ({
 });
 
 class ResponsiveDrawer extends React.Component {
+    database = new Database();
     initPath = require('../assets/movie.mp4')     //'http://localhost:3001/static/media/dummy1.d7171ce0.jpg';
 
     constructor(props) {

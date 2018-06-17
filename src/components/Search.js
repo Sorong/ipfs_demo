@@ -4,8 +4,8 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
-import {TextField} from "@material-ui/core/es/index";
-import Search from "@material-ui/icons/es/Search";
+import {TextField} from "@material-ui/core/index";
+import Search from "@material-ui/icons/Search";
 
 const styles = {
     root: {

@@ -4,7 +4,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
 import Search from "./Search"
 import UploadArea from "./UploadArea";
-import {Button} from "@material-ui/core/es/index";
+import {Button} from "@material-ui/core/index";
 
 const styles = theme => ({
     root: {

@@ -1,8 +1,8 @@
 import React from "react";
-import {Button, TextField} from "@material-ui/core/es/index";
+import {Button, TextField} from "@material-ui/core/index";
 import {withStyles} from "@material-ui/core/styles/index";
-import Add from "@material-ui/icons/es/Add";
-import Chat from "@material-ui/icons/es/Chat";
+import Add from "@material-ui/icons/Add";
+import Chat from "@material-ui/icons/Chat";
 
 const styles = {
     button: {},
