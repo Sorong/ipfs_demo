@@ -20,22 +20,13 @@ const styles = theme => ({
 });
 
 class ChipsArray extends React.Component {
-    state = {
-        chipData: [
-            { key: 0, label: 'Tag0' },
-            { key: 1, label: 'Tag1' },
-            { key: 2, label: 'Tag2' },
-            { key: 3, label: 'Tag3' },
-            { key: 4, label: 'Tag4' },
-        ],
-    };
 
     render() {
         const { classes } = this.props;
 
         return (
             <Paper className={classes.root}>
-                {this.state.chipData.map(data => {
+                {this.props.tags.map(data => {
                     let avatar = null;
 
                     if (data.label === 'React') {
@@ -56,7 +47,7 @@ class ChipsArray extends React.Component {
                         />
                     );
                 })}
-                <TextInput type="add"/>
+                <TextInput type="add" onClick={this.props.onClick}/>
             </Paper>
         );
     }

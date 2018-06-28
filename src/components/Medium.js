@@ -1,7 +1,7 @@
 import React from "react";
 
 
-class MainMedium extends React.Component {
+class Medium extends React.Component {
 
     isVideo() {
         if(this.props.medium === undefined) {
@@ -31,4 +31,4 @@ class MainMedium extends React.Component {
 
 }
 
-export default MainMedium;
+export default Medium;

@@ -12,7 +12,7 @@ class Database {
         this.isReady = false;
         this.ipfs.on('ready', () =>  {
             this.isReady = true;
-            this.orbitdb = new OrbitDB(this.ipfs)
+            this.db = new OrbitDB(this.ipfs)
         });
 
     }

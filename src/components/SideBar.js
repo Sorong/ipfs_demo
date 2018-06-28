@@ -85,7 +85,7 @@ const styles = theme => ({
     },
 });
 
-class SideMediums extends React.Component {
+class SideBar extends React.Component {
     videoDummy = require('../assets/video_dummy.jpg')
 
     constructor(props) {
@@ -107,7 +107,7 @@ class SideMediums extends React.Component {
 
         return (
             <div className={classes.root}>
-                <UploadArea/>
+                <UploadArea onDrop={this.props.onDrop}/>
                 <Search/>
 
                 {this.state.images.map(image => (
@@ -152,4 +152,4 @@ class SideMediums extends React.Component {
     }
 }
 
-export default withStyles(styles)(SideMediums);
+export default withStyles(styles)(SideBar);

@@ -13,30 +13,53 @@ const styles = {
 
 
 class TextInput extends React.Component {
+    state = {text: ''}
+
     constructor(props) {
         super(props);
+        this.handleChange = this.handleChange.bind(this);
     }
+
+    handleChange(e) {
+        this.setState({
+            text: e.target.value
+        });
+    }
+
+    clearText() {
+        this.setState({
+            text: ""
+        })
+    }
+
     getType() {
-        if(this.props.type === "add") {
+        if (this.props.type === "add") {
             return (<Add/>)
         }
         return (<Chat/>)
     }
 
     render() {
-        const { classes } = this.props;
+        const {classes} = this.props;
         return (
             <div>
                 <TextField
                     className={classes.text}
-                    //value={this.state.name}
+                    value={this.state.text}
                     //value={this.state.tag}
-                    //onChange={this.handleChange('tag')}
+                    onChange={this.handleChange}
                     //margin="normal"
                     multiline={this.props.type !== "add"}
-                    style = {{width: "80%"}}
+                    style={{width: "80%"}}
                 />
-                <Button variant="fab" className={classes.button} onClick={() => { console.log("hi"); }}  style = {{maxWidth: "20%"}} mini>
+                <Button variant="fab" className={classes.button}
+                        onClick={() => {
+                            this.props.onClick(this.state.text);
+                            this.clearText();
+                        }
+
+                        }
+                        style={{maxWidth: "20%"}} mini>
                     {this.getType()}
                 </Button>
             </div>

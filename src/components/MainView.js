@@ -8,14 +8,13 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import Hidden from '@material-ui/core/Hidden';
 import MenuIcon from '@material-ui/icons/Menu';
-import MainMedium from "./MainMedium";
-import ImageButtons from "./SideMediums";
+import Medium from "./Medium";
+import SideBar from "./SideBar";
 import Tags from "./Tags";
 import CommentContainer from "./CommentContainer";
 import Database from "../logic/Database";
 import MediumService from "../logic/MediumService";
-import CommentService from "../logic/CommentService";
-import TagService from "../logic/TagService";
+import TagCommentService from "../logic/TagCommentService";
 
 const drawerWidth = 250;
 
@@ -45,8 +44,9 @@ const styles = theme => ({
     toolbar: theme.mixins.toolbar,
     drawerPaper: {
         width: drawerWidth,
+        height: "100%",
         [theme.breakpoints.up('md')]: {
-            position: 'sticky',
+            position: 'relative',
         },
     },
     content: {
@@ -60,8 +60,7 @@ const styles = theme => ({
 class ResponsiveDrawer extends React.Component {
     database = new Database();
     mediumService = new MediumService(this.database);
-    commentService = new CommentService(this.database);
-    tagService = new TagService(this.database);
+    tagCommentService = new TagCommentService(this.database);
     state = {
         images : this.mediumService.getMediumList(),
     };
@@ -70,8 +69,8 @@ class ResponsiveDrawer extends React.Component {
     constructor(props) {
         super(props);
         let images = this.mediumService.getMediumList();
-        let tags = this.tagService.getTags(images[0].path);
-        let comments = this.commentService.getComments(images[0].tag);
+        let tags = this.tagCommentService.getTags(images[0].path);
+        let comments = this.tagCommentService.getComments(images[0].tag);
         this.state = {
             images: images,
             medium: this.state.images[0],
@@ -80,17 +79,41 @@ class ResponsiveDrawer extends React.Component {
             mobileOpen: false
         };
         this.changeMainImage = this.changeMainImage.bind(this);
+        this.addComment = this.addComment.bind(this);
+        this.addTag = this.addTag.bind(this);
     }
 
-    handleClick = (item) => {
+    mediumChanged = (item) => {
         this.changeMainImage(item);
+    };
+
+    uploadFile = (file) => {
+        console.log(file)
+      let medium = this.mediumService.putMedium(file);
+      //this.changeMainImage(medium);
+    };
+
+    addTag = (tag) => {
+        this.tagCommentService.putComment(this.state.medium.url, tag);
+        this.state.tags.push({key: "", label: tag})
+        this.setState({
+            tags : this.state.tags
+        })
+    };
+
+    addComment = (comment) => {
+        this.tagCommentService.putComment(this.state.medium.url, comment);
+        this.state.comments.push({text: comment})
+        this.setState({
+            comments : this.state.comments
+        })
     };
 
     changeMainImage(medium) {
         this.setState(() => ({
             medium: medium,
-            comments: this.commentService.getComments(medium.url),
-            tags: this.tagService.getTags(medium.url),
+            comments: this.tagCommentService.getComments(medium.url),
+            tags: this.tagCommentService.getTags(medium.url),
         }));
     }
 
@@ -101,7 +124,7 @@ class ResponsiveDrawer extends React.Component {
     drawer = (
         <div>
             <div className={this.props.classes.toolbar}/>
-            <ImageButtons images={this.state.images} onClick={this.handleClick}/>
+            <SideBar images={this.state.images} onClick={this.mediumChanged} onDrop={this.uploadFile}/>
         </div>
     );
 
@@ -158,9 +181,9 @@ class ResponsiveDrawer extends React.Component {
                 </Hidden>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
-                    <MainMedium medium={this.state.medium}/>
-                    <Tags/>
-                    <CommentContainer/>
+                    <Medium medium={this.state.medium}/>
+                    <Tags tags={this.state.tags} onClick={this.addTag}/>
+                    <CommentContainer comments={this.state.comments} onClick={this.addComment}/>
                 </main>
 
             </div>
@@ -173,6 +196,5 @@ ResponsiveDrawer.propTypes = {
     theme: PropTypes.object.isRequired,
 };
 
-ResponsiveDrawer.defaultProps = {};
 
 export default withStyles(styles, {withTheme: true})(ResponsiveDrawer);

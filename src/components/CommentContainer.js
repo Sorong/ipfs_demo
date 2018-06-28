@@ -11,38 +11,23 @@ const styles = theme => ({
     },
 });
 
-function LongTextSnackbar(props) {
-    const { classes } = props;
+class CommentContainer extends React.Component{
 
-
-    return (
-        <div>
-            <Comment className={classes.snackbar} message="I love snacks."/>
-            <Comment
-                className={classes.snackbar}
-                message={
-                    'I love candy. I love cookies. I love cupcakes. \
-                    I love cheesecake. I love chocolate.'
-                }
-            />
-            <Comment
-                className={classes.snackbar}
-                message="I love candy. I love cookies. I love cupcakes."
-            />
-            <Comment
-                className={classes.snackbar}
-                message={
-                    'I love candy. I love cookies. I love cupcakes. \
-                    I love cheesecake. I love chocolate.....................................'
-                }
-            />
-            <TextInput/>
-        </div>
-    );
+    render() {
+        const { classes } = this.props;
+        return (
+            <div>
+                {this.props.comments.map(data => (
+                    <Comment className={classes.snackbar} key={data.id} message={data.text}/>
+                ))}
+                <TextInput onClick={this.props.onClick}/>
+            </div>
+        )
+    }
 }
 
-LongTextSnackbar.propTypes = {
+CommentContainer.propTypes = {
     classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(LongTextSnackbar);
+export default withStyles(styles)(CommentContainer);

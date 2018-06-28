@@ -12,7 +12,7 @@ class MediumService {
     }
 
     putMedium(medium) {
-        return this.db.add(medium);
+        //return this.db.add(medium);
     }
 }
 
