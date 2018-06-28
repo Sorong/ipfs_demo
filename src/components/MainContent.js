@@ -13,6 +13,9 @@ import ImageButtons from "./SideMediums";
 import Tags from "./Tags";
 import CommentContainer from "./CommentContainer";
 import Database from "../logic/Database";
+import MediumService from "../logic/MediumService";
+import CommentService from "../logic/CommentService";
+import TagService from "../logic/TagService";
 
 const drawerWidth = 250;
 
@@ -55,20 +58,25 @@ const styles = theme => ({
 
 class ResponsiveDrawer extends React.Component {
     database = new Database();
-    initPath = require('../assets/movie.mp4')     //'http://localhost:3001/static/media/dummy1.d7171ce0.jpg';
+    mediumService = new MediumService(this.database);
+    commentService = new CommentService(this.database);
+    tagService = new TagService(this.database);
+    //'http://localhost:3001/static/media/dummy1.d7171ce0.jpg';
 
     constructor(props) {
         super(props);
+        let images = this.mediumService.getMediumList();
+        let tags = this.tagService.getTags(images[0].path);
+        let comments = this.commentService.getComments(images[0].tag);
         this.state = {
-            medium: this.initPath,
-            type: 'video'
+            images: images,
+            medium: images[0],
+            comments: comments,
+            tags: tags,
+            mobileOpen: false
         };
         this.changeMainImage = this.changeMainImage.bind(this);
     }
-
-    state = {
-        mobileOpen: false,
-    };
 
     handleClick = (item) => {
         this.changeMainImage(item);
@@ -81,12 +89,11 @@ class ResponsiveDrawer extends React.Component {
         }));
     }
 
-    drawer = (
-        <div>
-            <div className={this.props.classes.toolbar}/>
-            <ImageButtons onClick={this.handleClick}/>
-        </div>
-    );
+    changeSideMediums(images) {
+        this.setState(() => ({
+
+        }))
+    }
 
 
     handleDrawerToggle = () => {
@@ -126,7 +133,10 @@ class ResponsiveDrawer extends React.Component {
                             keepMounted: true, // Better open performance on mobile.
                         }}
                     >
-                        {this.drawer}
+                        <div>
+                            <div className={this.props.classes.toolbar}/>
+                            <ImageButtons images={this.state.images} onClick={this.handleClick}/>
+                        </div>
                     </Drawer>
                 </Hidden>
                 <Hidden smDown implementation="css">
@@ -142,7 +152,7 @@ class ResponsiveDrawer extends React.Component {
                 </Hidden>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
-                    <MainMedium path={this.state.medium} type={this.state.type}/>
+                    <MainMedium medium={this.state.medium} type={this.state.type}/>
                     <Tags/>
                     <CommentContainer/>
                 </main>

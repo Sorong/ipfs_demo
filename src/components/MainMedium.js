@@ -7,7 +7,7 @@ class MainMedium extends React.Component {
         if(this.props.type === undefined) {
             return false;
         }
-        return this.props.type.startsWith("video");
+        return this.props.medium.type.startsWith("video");
     }
 
     render() {
@@ -15,7 +15,7 @@ class MainMedium extends React.Component {
             return (
                 <div>
                     <video controls>
-                        <source src={this.props.path}/>
+                        <source src={this.props.medium.url}/>
                     </video>
                 </div>
             )
@@ -23,7 +23,7 @@ class MainMedium extends React.Component {
         return (
 
             <div>
-                <img src={this.props.path} alt=""/>
+                <img src={this.props.medium.url} alt=""/>
             </div>
 
         )

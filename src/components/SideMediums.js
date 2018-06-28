@@ -86,25 +86,21 @@ const styles = theme => ({
 });
 
 
-const images = [
-    {
-        url: 'http://localhost:3001/static/media/dummy0.5c8d5aa3.jpg',
-        title: '1',
-        width: '100%'
-    },
-    {
-        url: 'http://localhost:3001/static/media/dummy1.d7171ce0.jpg',
-        title: '2',
-        width: '100%',
-    },
-    {
-        url: 'http://localhost:3001/static/media/dummy2.4338a1b8.jpg',
-        title: '3',
-        width: '100%',
-    },
-];
+
 
 class SideMediums extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            images : this.props.images
+        }
+    }
+
+    changeContent(newImages) {
+        this.setState(() => ({
+            images : newImages
+        }))
+    }
 
     render() {
         const {classes} = this.props;
@@ -115,7 +111,7 @@ class SideMediums extends React.Component {
                 <UploadArea/>
                 <Search/>
 
-                {images.map(image => (
+                {this.state.images.map(image => (
                     <ButtonBase
                         focusRipple
                         key={image.title}

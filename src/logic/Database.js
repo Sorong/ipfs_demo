@@ -9,9 +9,12 @@ const ipfsOptions = {
 class Database {
     constructor() {
         this.ipfs = new IPFS(ipfsOptions);
+        this.isReady = false;
         this.ipfs.on('ready', () =>  {
+            this.isReady = true;
             this.orbitdb = new OrbitDB(this.ipfs)
         });
+
     }
 
     async get(key, limit = 1) {
