@@ -56,11 +56,15 @@ const styles = theme => ({
     },
 });
 
+
 class ResponsiveDrawer extends React.Component {
     database = new Database();
     mediumService = new MediumService(this.database);
     commentService = new CommentService(this.database);
     tagService = new TagService(this.database);
+    state = {
+        images : this.mediumService.getMediumList(),
+    };
     //'http://localhost:3001/static/media/dummy1.d7171ce0.jpg';
 
     constructor(props) {
@@ -70,7 +74,7 @@ class ResponsiveDrawer extends React.Component {
         let comments = this.commentService.getComments(images[0].tag);
         this.state = {
             images: images,
-            medium: images[0],
+            medium: this.state.images[0],
             comments: comments,
             tags: tags,
             mobileOpen: false
@@ -82,18 +86,24 @@ class ResponsiveDrawer extends React.Component {
         this.changeMainImage(item);
     };
 
-    changeMainImage(path) {
+    changeMainImage(medium) {
         this.setState(() => ({
-            medium : path,
-            type : "image"
+            medium: medium,
+            comments: this.commentService.getComments(medium.url),
+            tags: this.tagService.getTags(medium.url),
         }));
     }
 
     changeSideMediums(images) {
-        this.setState(() => ({
-
-        }))
+        this.setState(() => ({}))
     }
+
+    drawer = (
+        <div>
+            <div className={this.props.classes.toolbar}/>
+            <ImageButtons images={this.state.images} onClick={this.handleClick}/>
+        </div>
+    );
 
 
     handleDrawerToggle = () => {
@@ -102,7 +112,6 @@ class ResponsiveDrawer extends React.Component {
 
     render() {
         const {classes, theme} = this.props;
-
         return (
             <div className={classes.root}>
                 <AppBar className={classes.appBar}>
@@ -133,10 +142,7 @@ class ResponsiveDrawer extends React.Component {
                             keepMounted: true, // Better open performance on mobile.
                         }}
                     >
-                        <div>
-                            <div className={this.props.classes.toolbar}/>
-                            <ImageButtons images={this.state.images} onClick={this.handleClick}/>
-                        </div>
+                        {this.drawer}
                     </Drawer>
                 </Hidden>
                 <Hidden smDown implementation="css">
@@ -152,7 +158,7 @@ class ResponsiveDrawer extends React.Component {
                 </Hidden>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
-                    <MainMedium medium={this.state.medium} type={this.state.type}/>
+                    <MainMedium medium={this.state.medium}/>
                     <Tags/>
                     <CommentContainer/>
                 </main>
@@ -166,5 +172,7 @@ ResponsiveDrawer.propTypes = {
     classes: PropTypes.object.isRequired,
     theme: PropTypes.object.isRequired,
 };
+
+ResponsiveDrawer.defaultProps = {};
 
 export default withStyles(styles, {withTheme: true})(ResponsiveDrawer);

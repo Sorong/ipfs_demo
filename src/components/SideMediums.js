@@ -85,20 +85,19 @@ const styles = theme => ({
     },
 });
 
-
-
-
 class SideMediums extends React.Component {
+    videoDummy = require('../assets/video_dummy.jpg')
+
     constructor(props) {
         super(props);
         this.state = {
-            images : this.props.images
+            images: this.props.images === undefined ? [] : this.props.images
         }
     }
 
     changeContent(newImages) {
         this.setState(() => ({
-            images : newImages
+            images: newImages
         }))
     }
 
@@ -121,12 +120,14 @@ class SideMediums extends React.Component {
                             width: image.width,
                         }}
                         //onClick={() => { console.log(image.title); }}
-                        onClick={() => {this.props.onClick(image.url);}}
+                        onClick={() => {
+                            this.props.onClick(image);
+                        }}
                     >
                         <span
                             className={classes.imageSrc}
                             style={{
-                                backgroundImage: `url(${image.url})`
+                                backgroundImage: `url(${image.type === "video" ? this.videoDummy : image.url})`
                             }}
                         />
                         <span className={classes.imageBackdrop}/>

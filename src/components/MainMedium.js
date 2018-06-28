@@ -4,7 +4,7 @@ import React from "react";
 class MainMedium extends React.Component {
 
     isVideo() {
-        if(this.props.type === undefined) {
+        if(this.props.medium === undefined) {
             return false;
         }
         return this.props.medium.type.startsWith("video");
