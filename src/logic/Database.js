@@ -53,13 +53,13 @@ class Database {
         this.ipfs.files.add(data, (err, files) => {
             data.hash = files[0].hash;
             data.path = "/ipfs/" + data.hash;
-            this._addMedium(data);
+            this._addMedium(data).then();
         });
     }
 
     async _addMedium(data) {
         const exist = this.repostLog.get(data.hash);
-        if (exist !== undefined) {
+        if (exist === undefined) {
             this.mediaLog.add(data.hash).then((h) => {
                 console.log("Item: " + h);
                 this.repostLog.put(data.hash, data);
@@ -69,5 +69,5 @@ class Database {
 
 }
 
-export default (new Database);
+export default (new Database());
 

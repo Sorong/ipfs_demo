@@ -123,8 +123,9 @@ class ResponsiveDrawer extends React.Component {
             comments: [],
             tags: [],
         }));
+
         this.mediumService.getMedium(medium.hash).then(m => {
-            this.tagCommentService.getComments(m).then(c => {
+            this.tagCommentService.getComments(m).then(c =>  {
                 this.tagCommentService.getTags(m).then(t => {
                     this.setState(() => ({
                             medium : m,

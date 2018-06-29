@@ -7,6 +7,7 @@ class MediaService {
     getDummy() {
         return dummy;
     }
+
     async getMedium(hash) {
         return await this.db.getSpecific(hash);
     }
@@ -23,10 +24,10 @@ class MediaService {
 
     }
 
-    putMedium(medium) {
-        this._storeFile(medium);
+    async putMedium(medium) {
+        await this._storeFile(medium).then(() => {console.log("Medium added")});
 
-        return this._addTemp(medium);
+        return await this._addTemp(medium);
         //return this.db.add(medium);
     }
 
@@ -41,7 +42,7 @@ class MediaService {
             reader.onload = () => {
                 resolve({
                     content: reader.result,
-                    hash: "none",
+                    hash: medium.hash,
                     path: medium.name,
                     type: medium.type,
                     width: "100%"
@@ -53,25 +54,28 @@ class MediaService {
     }
 
 
-    _storeFile(medium) {
+    async _storeFile(medium) {
         let reader = new FileReader();
-        reader.onerror = () => {
-            reader.abort();
-        };
-
-        reader.onload = () => {
-            medium = {
-                content: buffer.from(reader.result),
-                hash: "none",
-                path: medium.name,
-                type: medium.type,
-                width: "100%"
+        return new Promise((resolve, reject) => {
+            reader.onerror = () => {
+                reader.abort();
+                reject(new DOMException("Problem parsing input file."));
             };
-            this.db.addMedium([medium]);
-        };
-        reader.readAsArrayBuffer(medium);
-    }
 
+            reader.onload = () => {
+                this.db.addMedium([medium]);
+                resolve({
+                    content: buffer.from(reader.result),
+                    hash: medium.hash,
+                    path: medium.name,
+                    type: medium.type,
+                    width: "100%"
+                });
+
+            };
+            reader.readAsArrayBuffer(medium);
+        });
+    }
 }
 
 export default MediaService;
