@@ -31,15 +31,16 @@ class SearchBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            tag : ''
+            text : ''
         };
         this.handleChange = this.handleChange.bind(this);
     }
-    handleChange = tag => event => {
+
+    handleChange(e) {
         this.setState({
-            [tag]: event.target.value,
+            text: e.target.value
         });
-    };
+    }
 
     render() {
         const { classes } = this.props;
@@ -49,12 +50,9 @@ class SearchBar extends React.Component {
                     <Toolbar>
                         <TextField
                             className={classes.text}
-                            //value={this.state.name}
-                            value={this.state.tag}
-                            onChange={this.handleChange('tag')}
-                            //margin="normal"
+                            onChange={this.handleChange}
                         />
-                        <Button variant="fab" className={classes.button} onClick={() => { console.log(this.state.tag); }} mini>
+                        <Button variant="fab" className={classes.button} onClick={() => { this.props.onClick(this.state.text)}} mini>
                             <Search/>
                         </Button>
                     </Toolbar>

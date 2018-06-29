@@ -13,7 +13,7 @@ import SideBar from "./SideBar";
 import Tags from "./Tags";
 import CommentContainer from "./CommentContainer";
 import Database from "../logic/Database";
-import MediumService from "../logic/MediumService";
+import MediaService from "../logic/MediaService";
 import TagCommentService from "../logic/TagCommentService";
 
 const drawerWidth = 250;
@@ -58,75 +58,105 @@ const styles = theme => ({
 
 
 class ResponsiveDrawer extends React.Component {
-    database = new Database();
-    mediumService = new MediumService(this.database);
+    database = Database;
+    mediumService = new MediaService(this.database);
     tagCommentService = new TagCommentService(this.database);
     state = {
-        images : this.mediumService.getMediumList(),
+        thumbnails: [],
+        medium: this.mediumService.getDummy(),
+        comments: [],
+        tags: [],
+        mobileOpen: false,
     };
+
     //'http://localhost:3001/static/media/dummy1.d7171ce0.jpg';
 
     constructor(props) {
         super(props);
-        let images = this.mediumService.getMediumList();
-        let tags = this.tagCommentService.getTags(images[0].path);
-        let comments = this.tagCommentService.getComments(images[0].tag);
-        this.state = {
-            images: images,
-            medium: this.state.images[0],
-            comments: comments,
-            tags: tags,
-            mobileOpen: false
-        };
-        this.changeMainImage = this.changeMainImage.bind(this);
+        //this.showMore();
+        this.mediumChanged = this.mediumChanged.bind(this);
         this.addComment = this.addComment.bind(this);
         this.addTag = this.addTag.bind(this);
+        this.search = this.search.bind(this);
+        this.showMore = this.showMore.bind(this);
+        this.upload = this.upload.bind(this);
     }
 
-    mediumChanged = (item) => {
-        this.changeMainImage(item);
-    };
-
-    uploadFile = (file) => {
-        console.log(file)
-      let medium = this.mediumService.putMedium(file);
-      //this.changeMainImage(medium);
+    uploadFile = async (files) => {
+        try {
+            this.mediumService.putMedium(files[0]).then(m => {this.upload(m)});
+        } catch (e) {
+            console.warn("Upload failed.");
+        }
     };
 
     addTag = (tag) => {
         this.tagCommentService.putComment(this.state.medium.url, tag);
-        this.state.tags.push({key: "", label: tag})
+        this.state.tags.push({key: "", label: tag});
         this.setState({
-            tags : this.state.tags
+            tags: this.state.tags
         })
     };
 
     addComment = (comment) => {
         this.tagCommentService.putComment(this.state.medium.url, comment);
-        this.state.comments.push({text: comment})
+        this.state.comments.push({text: comment});
         this.setState({
-            comments : this.state.comments
+            comments: this.state.comments
         })
     };
 
-    changeMainImage(medium) {
+    upload = (medium) => {
+        if(medium === undefined) {
+            return;
+        }
+        this.mediumChanged(medium);
+        this.state.thumbnails.unshift(medium);
+        this.setState({
+            thumbnails: this.state.thumbnails
+        });
+    };
+
+    mediumChanged = (medium) => {
         this.setState(() => ({
             medium: medium,
-            comments: this.tagCommentService.getComments(medium.url),
-            tags: this.tagCommentService.getTags(medium.url),
+            comments: [],
+            tags: [],
         }));
-    }
+        this.mediumService.getMedium(medium.hash).then(m => {
+            this.tagCommentService.getComments(m).then(c => {
+                this.tagCommentService.getTags(m).then(t => {
+                    this.setState(() => ({
+                            medium : m,
+                            comments: c,
+                            tags: t
+                        })
+                    )
+                })
+            })
+        });
+    };
 
-    changeSideMediums(images) {
-        this.setState(() => ({}))
-    }
+    showMore = () => {
+        this.mediumService.getMediumList().then((images => {
+                this.setState(() => ({
+                    thumbnails: images
+                }));
+            })
+        )
 
-    drawer = (
-        <div>
-            <div className={this.props.classes.toolbar}/>
-            <SideBar images={this.state.images} onClick={this.mediumChanged} onDrop={this.uploadFile}/>
-        </div>
-    );
+    };
+
+    search = (tag) => {
+        console.log("search " + tag);
+        this.mediumService.getMediumList(tag.trim().toLowerCase()).then((images => {
+            this.setState(() => ({
+                thumbnails: images,
+                medium: images.length > 0 ? images[0] : this.state.medium
+            }));
+        }))
+
+    };
 
 
     handleDrawerToggle = () => {
@@ -165,7 +195,15 @@ class ResponsiveDrawer extends React.Component {
                             keepMounted: true, // Better open performance on mobile.
                         }}
                     >
-                        {this.drawer}
+                        <div>
+                            <div className={this.props.classes.toolbar}/>
+                            <SideBar images={this.state.thumbnails}
+                                     onClick={this.mediumChanged}
+                                     onDrop={this.uploadFile}
+                                     onMore={this.showMore}
+                                     onSearch={this.search}
+                            />
+                        </div>
                     </Drawer>
                 </Hidden>
                 <Hidden smDown implementation="css">
@@ -176,7 +214,15 @@ class ResponsiveDrawer extends React.Component {
                             paper: classes.drawerPaper,
                         }}
                     >
-                        {this.drawer}
+                        <div>
+                            <div className={this.props.classes.toolbar}/>
+                            <SideBar images={this.state.thumbnails}
+                                     onClick={this.mediumChanged}
+                                     onDrop={this.uploadFile}
+                                     onMore={this.showMore}
+                                     onSearch={this.search}
+                            />
+                        </div>
                     </Drawer>
                 </Hidden>
                 <main className={classes.content}>

@@ -86,20 +86,7 @@ const styles = theme => ({
 });
 
 class SideBar extends React.Component {
-    videoDummy = require('../assets/video_dummy.jpg')
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            images: this.props.images === undefined ? [] : this.props.images
-        }
-    }
-
-    changeContent(newImages) {
-        this.setState(() => ({
-            images: newImages
-        }))
-    }
+    videoDummy = require('../assets/video_dummy.jpg');
 
     render() {
         const {classes} = this.props;
@@ -108,18 +95,17 @@ class SideBar extends React.Component {
         return (
             <div className={classes.root}>
                 <UploadArea onDrop={this.props.onDrop}/>
-                <Search/>
+                <Search onClick={this.props.onSearch}/>
 
-                {this.state.images.map(image => (
+                {this.props.images.map(image => (
                     <ButtonBase
                         focusRipple
-                        key={image.title}
+                        key={image.hash}
                         className={classes.image}
                         focusVisibleClassName={classes.focusVisible}
                         style={{
                             width: image.width,
                         }}
-                        //onClick={() => { console.log(image.title); }}
                         onClick={() => {
                             this.props.onClick(image);
                         }}
@@ -127,7 +113,7 @@ class SideBar extends React.Component {
                         <span
                             className={classes.imageSrc}
                             style={{
-                                backgroundImage: `url(${image.type === "video" ? this.videoDummy : image.url})`
+                                backgroundImage: `url(${image.type === "video" ? this.videoDummy : image.content})`
                             }}
                         />
                         <span className={classes.imageBackdrop}/>
@@ -144,7 +130,7 @@ class SideBar extends React.Component {
           </span>
                     </ButtonBase>
                 ))}
-                <Button variant="contained" className={classes.button} fullWidth>
+                <Button variant="contained" className={classes.button} onClick={this.props.onMore} fullWidth>
                     More
                 </Button>
             </div>

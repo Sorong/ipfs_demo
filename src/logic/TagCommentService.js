@@ -1,5 +1,7 @@
 class TagCommentService {
-
+    constructor(db) {
+        this.db = db;
+    }
     putComment(hash, comment) {
 
     }
@@ -7,27 +9,13 @@ class TagCommentService {
 
     }
 
-    getComments(hash) {
-        return comments;
+    async getComments(hash) {
+        return [];
     }
 
-    getTags(hash) {
-        return tags;
+    async getTags(hash) {
+        return [];
     }
 }
-
-const tags = [
-    { key: 0, label: 'Trump' },
-    { key: 1, label: 'Kim' },
-    { key: 2, label: 'Covfefe' },
-    { key: 3, label: 'Tag3' },
-    { key: 4, label: 'Tag4' },
-];
-
-const comments = [
-    {id: 0, text: "höhö lustig"},
-    {id: 1, text: "covfefe?"}
-];
-
 
 export default TagCommentService;

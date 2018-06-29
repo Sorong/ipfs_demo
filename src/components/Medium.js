@@ -15,7 +15,7 @@ class Medium extends React.Component {
             return (
                 <div>
                     <video controls>
-                        <source src={this.props.medium.url}/>
+                        <source src={this.props.medium.content} style={{maxWidth : this.props.medium.width}}/>
                     </video>
                 </div>
             )
@@ -23,7 +23,7 @@ class Medium extends React.Component {
         return (
 
             <div>
-                <img src={this.props.medium.url} alt=""/>
+                <img src={this.props.medium.content} alt="" style={{maxWidth : this.props.medium.width}}/>
             </div>
 
         )
