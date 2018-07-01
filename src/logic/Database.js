@@ -1,34 +1,40 @@
 const IPFS = require('ipfs');
 const OrbitDB = require('orbit-db');
-const ipfsAPI = require('ipfs-api');
-const series = require('async/series');
+const wrtc = require('wrtc')
+const WStar = require('libp2p-webrtc-star')
+const wstar = new WStar({ wrtc: wrtc })
 
 const ipfsOptions = {
     EXPERIMENTAL: {
         pubsub: true
     },
     start: true,
-    config: {
-        Addresses: {
-            Swarm: [
-                // Use IPFS dev signal server
-                // Prefer websocket over webrtc
-                //
-                // Websocket:
-                // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
-                '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star',
-                '/p2p-circuit/ipfs/QmcEt244uzAmT7YGHzumJb78SggZCrpV1EPQ6gtEFg3ZS6',
-                // Local signal server
-                //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star'
-                //
-                // WebRTC:
-                // '/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
-                // Local signal server
-                '/ip4/127.0.0.1/tcp/5001',
-                "/ip4/0.0.0.0/tcp/4001"
-            ]
-        }
-    }
+    // config: {
+    //     Addresses: {
+    //         Swarm: [
+    //             // Use IPFS dev signal server
+    //             // Prefer websocket over webrtc
+    //             //
+    //             // Websocket:
+    //             // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
+    //             //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star',
+    //             // Local signal server
+    //             //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star'
+    //             //
+    //             // WebRTC:
+    //              //'/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
+    //             //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+    //             '/dns4/star-signal.cloud.ipfs.team/tcp/443/wss/p2p-webrtc-star/'
+    //             // Local signal server
+    //             // '/ip4/127.0.0.1/tcp/1337/ws/p2p-webrtc-star'
+    //         ]
+    //     }, libp2p: {
+    //         modules: {
+    //             transport: [wstar],
+    //             discovery: [wstar.discovery]
+    //         }
+    //     }
+    // }
 };
 
 
@@ -39,8 +45,6 @@ class Database {
     constructor() {
         this.init = this.init.bind(this);
         this.repostLog = '';
-        //this.tagLog = '';
-        //this.commentLog = '';
         this.mediaLog = '';
         this.ipfs = '';
         this.node = '';
@@ -70,7 +74,9 @@ class Database {
                 console.log(address)
             });
             this.state = true;
+            console.log("ipfs is ready");
         });
+
         this.ipfs.on('start',
             () => {
                 console.log('Node started!');
@@ -93,7 +99,7 @@ class Database {
             let data = this.repostLog.get(hash);
             data.content = content;
             return data;
-        }).bind(this));
+        }));
     }
 
     async getLast(tag = '', limit = -1) {
@@ -115,7 +121,7 @@ class Database {
                 width: "100%"
             };
             return this._postFile(m);
-        }).bind(this))
+        }))
     }
 
     async _postFile(data) {

@@ -77,17 +77,17 @@ class ResponsiveDrawer extends React.Component {
         this.search = this.search.bind(this);
         this.showMore = this.showMore.bind(this);
         this.upload = this.upload.bind(this);
-        setTimeout(() => {
-            this.showMore();
-        }, 1000)
+        this.init();
     }
     init() {
-        if(!this.db.isReady()){
+        if(!this.database.isReady()){
             setTimeout(() => {
                 this.init();
             }, 1000)
+        } else {
+            this.showMore();
         }
-        this.showMore();
+
     }
 
     uploadFile = (files) => {
@@ -133,6 +133,7 @@ class ResponsiveDrawer extends React.Component {
     };
 
     mediumChanged = (medium) => {
+        console.log("Displayed medium hash: " + medium.hash);
         this.setState(() => ({
             medium: medium,
             comments: [],

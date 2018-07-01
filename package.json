@@ -10,6 +10,7 @@
     "express": "^4.16.3",
     "ipfs": "^0.29.3",
     "ipfsd-ctl": "^0.37.5",
+    "libp2p-webrtc-star": "^0.15.3",
     "orbit-db": "^0.19.8",
     "prop-types": "latest",
     "react": "^16.4.1",
@@ -17,7 +18,8 @@
     "react-dropzone": "^4.2.11",
     "react-scripts": "1.1.4",
     "react-sidebar": "^2.3.2",
-    "requirejs": "^2.3.5"
+    "requirejs": "^2.3.5",
+    "wrtc": "^0.1.6"
   },
   "scripts": {
     "start": "react-scripts start",
