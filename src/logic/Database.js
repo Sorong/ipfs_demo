@@ -9,6 +9,16 @@ const ipfsOptions = {
         pubsub: true
     },
     start: true,
+    config: {
+        Addresses: {
+            Swarm: ['/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star']
+        }
+    }, libp2p: {
+        modules: {
+            transport : [wstar],
+            discovery : [wstar.discovery]
+        }
+    }
 };
 
 class Database {
@@ -49,9 +59,9 @@ class Database {
         this.ipfs.on('start',
             () => {
                 console.log('Node started!');
-                this.ipfs.swarm.connect('/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf')
+                this.ipfs.swarm.connect('/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmdiX3ja8z9myZdj11DwCk1Kn1aWsLYvPEFvEgcwmRJ8uq')
                     .then(() => {
-                        console.log(`Successfully connected to peer.`)
+                        console.log(`Successfully connected to peer.`);
                         this.ipfs.swarm.peers(function (err, peerInfos) {
                             if (err) {
                                 throw err
