@@ -2,43 +2,41 @@ const IPFS = require('ipfs');
 const OrbitDB = require('orbit-db');
 const wrtc = require('wrtc')
 const WStar = require('libp2p-webrtc-star')
-const wstar = new WStar({ wrtc: wrtc })
+const wstar = new WStar({wrtc: wrtc})
 
 const ipfsOptions = {
     EXPERIMENTAL: {
         pubsub: true
     },
     start: true,
-    // config: {
-    //     Addresses: {
-    //         Swarm: [
-    //             // Use IPFS dev signal server
-    //             // Prefer websocket over webrtc
-    //             //
-    //             // Websocket:
-    //             // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
-    //             //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star',
-    //             // Local signal server
-    //             //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star'
-    //             //
-    //             // WebRTC:
-    //              //'/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
-    //             //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-    //             '/dns4/star-signal.cloud.ipfs.team/tcp/443/wss/p2p-webrtc-star/'
-    //             // Local signal server
-    //             // '/ip4/127.0.0.1/tcp/1337/ws/p2p-webrtc-star'
-    //         ]
-    //     }, libp2p: {
-    //         modules: {
-    //             transport: [wstar],
-    //             discovery: [wstar.discovery]
-    //         }
-    //     }
-    // }
+    config: {
+        Addresses: {
+            Swarm: [
+                // Use IPFS dev signal server
+                // Prefer websocket over webrtc
+                //
+                // Websocket:
+                // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
+                //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf',
+                // Local signal server
+                //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star',
+                //'/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf',
+                //
+                // WebRTC:
+                //'/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
+                //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
+                //'/dns4/star-signal.cloud.ipfs.team/tcp/443/wss/p2p-webrtc-star/'
+                // Local signal server
+                // '/ip4/127.0.0.1/tcp/1337/ws/p2p-webrtc-star'
+            ]
+        }, libp2p: {
+            modules: {
+                transport: [wstar],
+                discovery: [wstar.discovery]
+            }
+        }
+    }
 };
-
-
-const node = new IPFS()
 
 class Database {
 
@@ -74,20 +72,30 @@ class Database {
                 console.log(address)
             });
             this.state = true;
+
             console.log("ipfs is ready");
         });
 
         this.ipfs.on('start',
             () => {
                 console.log('Node started!');
-                this.ipfs.swarm.peers(function (err, peerInfos) {
-                    if (err) {
-                        throw err
-                    }
-                    console.log(peerInfos)
-                })
+                this.ipfs.swarm.connect('/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf')
+                    .then(() => {
+                        console.log(`Successfully connected to peer.`)
+                        this.ipfs.swarm.peers(function (err, peerInfos) {
+                            if (err) {
+                                throw err
+                            }
+                            console.log(peerInfos)
+                        })
+                    })
+                    .catch((err) => console.log('An error occurred when connecting to the peer.' + err))
+
+
             }
+
         );
+
     }
 
     isReady() {
@@ -95,7 +103,7 @@ class Database {
     }
 
     async getSpecific(hash) {
-        return node.files.cat(hash).then((content => {
+        return this.ipfs.files.cat(hash).then((content => {
             let data = this.repostLog.get(hash);
             data.content = content;
             return data;
@@ -103,12 +111,16 @@ class Database {
     }
 
     async getLast(tag = '', limit = -1) {
-        if(tag !== '') {
-            let tagFilter = await this.orbitdb.log("tagfilter" + tag);
-            await tagFilter.load();
-            return await tagFilter.iterator({limit: limit, reversed: true}).collect().map((e) => e.payload.value)
+        if (tag !== '') {
+            let tagFilter = await
+                this.orbitdb.log("tagfilter" + tag);
+            await
+                tagFilter.load();
+            return await
+                tagFilter.iterator({limit: limit, reversed: true}).collect().map((e) => e.payload.value)
         }
-        return await this.mediaLog.iterator({limit: limit, reversed: true}).collect().map((e) => e.payload.value)
+        return await
+            this.mediaLog.iterator({limit: limit, reversed: true}).collect().map((e) => e.payload.value)
     }
 
     postFile(databuffer, medium) {
@@ -144,29 +156,39 @@ class Database {
     }
 
     async postComment(hash, comment) {
-        let commentLog = await this.orbitdb.log("comment" + hash);
-        await commentLog.load();
+        let commentLog = await
+            this.orbitdb.log("comment" + hash);
+        await
+            commentLog.load();
         return commentLog.add(comment);
     }
 
     async getComments(hash) {
-        let commentLog = await this.orbitdb.log("comment" + hash);
-        await commentLog.load();
+        let commentLog = await
+            this.orbitdb.log("comment" + hash);
+        await
+            commentLog.load();
         return commentLog.iterator({limit: -1}).collect().map((e) => e.payload.value)
     }
 
     async postTag(hash, tag) {
-        let tagLog = await this.orbitdb.log("tags" + hash);
-        let tagFilter = await this.orbitdb.log("tagfilter" + tag);
-        await tagFilter.load();
+        let tagLog = await
+            this.orbitdb.log("tags" + hash);
+        let tagFilter = await
+            this.orbitdb.log("tagfilter" + tag);
+        await
+            tagFilter.load();
         tagFilter.add(hash);
-        await tagLog.load();
+        await
+            tagLog.load();
         return tagLog.add(tag);
     }
 
     async getTags(hash) {
-        let tagLog = await this.orbitdb.log("tags" + hash);
-        await tagLog.load();
+        let tagLog = await
+            this.orbitdb.log("tags" + hash);
+        await
+            tagLog.load();
         return tagLog.iterator({limit: -1}).collect().map((e) => e.payload.value)
     }
 
