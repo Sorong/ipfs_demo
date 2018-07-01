@@ -1,70 +1,167 @@
-const IPFS = require('ipfs')
-const OrbitDB = require('orbit-db')
+const IPFS = require('ipfs');
+const OrbitDB = require('orbit-db');
+const ipfsAPI = require('ipfs-api');
+const series = require('async/series');
 
+const ipfsOptions = {
+    EXPERIMENTAL: {
+        pubsub: true
+    },
+    start: true,
+    config: {
+        Addresses: {
+            Swarm: [
+                // Use IPFS dev signal server
+                // Prefer websocket over webrtc
+                //
+                // Websocket:
+                // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
+                '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star',
+                '/p2p-circuit/ipfs/QmcEt244uzAmT7YGHzumJb78SggZCrpV1EPQ6gtEFg3ZS6',
+                // Local signal server
+                //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star'
+                //
+                // WebRTC:
+                // '/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
+                // Local signal server
+                '/ip4/127.0.0.1/tcp/5001',
+                "/ip4/0.0.0.0/tcp/4001"
+            ]
+        }
+    }
+};
+
+
+const node = new IPFS()
 
 class Database {
 
     constructor() {
         this.init = this.init.bind(this);
         this.repostLog = '';
-        this.tagLog = '';
-        this.commentLog = '';
+        //this.tagLog = '';
+        //this.commentLog = '';
         this.mediaLog = '';
         this.ipfs = '';
+        this.node = '';
         this.orbitdb = '';
+        this.state = false;
         this.init();
     }
 
     init() {
-        this.ipfs = new IPFS();
+        this.ipfs = new IPFS(ipfsOptions);
+        //this.daemon = ipfsAPI('localhost', '5001');
+
         this.ipfs.on('ready', async () => {
             this.orbitdb = new OrbitDB(this.ipfs);
 
             this.repostLog = await this.orbitdb.kvstore('repost');
-            await this.repostLog.drop();
+            //await this.repostLog.drop();
             await this.repostLog.load();
 
-            this.mediaLog = await this.orbitdb.log('media');
-            await this.mediaLog.drop();
+            this.mediaLog = await  this.orbitdb.log('media');
+            //await this.mediaLog.drop();
             await this.mediaLog.load();
 
             // Listen for updates from peers
             this.mediaLog.events.on('replicated', (address) => {
-                console.log(this.mediaLog.iterator({limit: -1}).collect())
+                console.log(this.mediaLog.iterator({limit: -1}).collect());
+                console.log(address)
             });
+            this.state = true;
         });
+        this.ipfs.on('start',
+            () => {
+                console.log('Node started!');
+                this.ipfs.swarm.peers(function (err, peerInfos) {
+                    if (err) {
+                        throw err
+                    }
+                    console.log(peerInfos)
+                })
+            }
+        );
+    }
+
+    isReady() {
+        return this.state;
     }
 
     async getSpecific(hash) {
-        const data = this.repostLog.get(hash);
-        this.tagLog = await this.orbitdb.eventlog(hash);
-        this.tagLog.load();
+        return node.files.cat(hash).then((content => {
+            let data = this.repostLog.get(hash);
+            data.content = content;
+            return data;
+        }).bind(this));
+    }
 
-        this.commentLog = await this.orbitdb.eventlog(hash);
-        this.commentLog.load();
+    async getLast(tag = '', limit = -1) {
+        if(tag !== '') {
+            let tagFilter = await this.orbitdb.log("tagfilter" + tag);
+            await tagFilter.load();
+            return await tagFilter.iterator({limit: limit, reversed: true}).collect().map((e) => e.payload.value)
+        }
+        return await this.mediaLog.iterator({limit: limit, reversed: true}).collect().map((e) => e.payload.value)
+    }
+
+    postFile(databuffer, medium) {
+        return this.ipfs.files.add(databuffer).then((data => {
+            let m = {
+                content: medium.name,
+                hash: data[0].hash,
+                path: "/ipfs/" + data[0].hash,
+                type: medium.type,
+                width: "100%"
+            };
+            return this._postFile(m);
+        }).bind(this))
+    }
+
+    async _postFile(data) {
+        const exist = this.repostLog.get(data.hash);
+        if (exist === undefined) {
+            return this.mediaLog.add(data.hash).then((h => {
+                console.log("Item logged: " + data.hash);
+                let d = {
+                    hash: data.hash,
+                    path: data.path,
+                    type: data.type,
+                    width: data.width
+                };
+                return this.repostLog.put(data.hash, d);
+            })).then(() => {
+                return data
+            });
+        }
         return data;
     }
 
-    async getLast(limit = -1) {
-        return await this.mediaLog.iterator({limit: limit}).collect().map((e) => e.payload.value)
+    async postComment(hash, comment) {
+        let commentLog = await this.orbitdb.log("comment" + hash);
+        await commentLog.load();
+        return commentLog.add(comment);
     }
 
-    addMedium(data) {
-        this.ipfs.files.add(data, (err, files) => {
-            data.hash = files[0].hash;
-            data.path = "/ipfs/" + data.hash;
-            this._addMedium(data).then();
-        });
+    async getComments(hash) {
+        let commentLog = await this.orbitdb.log("comment" + hash);
+        await commentLog.load();
+        return commentLog.iterator({limit: -1}).collect().map((e) => e.payload.value)
     }
 
-    async _addMedium(data) {
-        const exist = this.repostLog.get(data.hash);
-        if (exist === undefined) {
-            this.mediaLog.add(data.hash).then((h) => {
-                console.log("Item: " + h);
-                this.repostLog.put(data.hash, data);
-            });
-        }
+    async postTag(hash, tag) {
+        let tagLog = await this.orbitdb.log("tags" + hash);
+        let tagFilter = await this.orbitdb.log("tagfilter" + tag);
+        await tagFilter.load();
+        tagFilter.add(hash);
+        await tagLog.load();
+        return tagLog.add(tag);
+    }
+
+    async getTags(hash) {
+        let tagLog = await this.orbitdb.log("tags" + hash);
+        await tagLog.load();
+        return tagLog.iterator({limit: -1}).collect().map((e) => e.payload.value)
     }
 
 }

@@ -113,7 +113,7 @@ class SideBar extends React.Component {
                         <span
                             className={classes.imageSrc}
                             style={{
-                                backgroundImage: `url(${image.type === "video" ? this.videoDummy : image.content})`
+                                backgroundImage: `url(${image.type.startsWith("video" ) ? this.videoDummy : image.content})`
                             }}
                         />
                         <span className={classes.imageBackdrop}/>

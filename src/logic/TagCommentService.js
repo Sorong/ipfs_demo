@@ -3,18 +3,19 @@ class TagCommentService {
         this.db = db;
     }
     putComment(hash, comment) {
-
+        return this.db.postComment(hash, comment);
     }
+
     putTag(hash, tag) {
-
+        return this.db.postTag(hash, tag);
     }
 
-    async getComments(hash) {
-        return [];
+    getComments(hash) {
+        return this.db.getComments(hash);
     }
 
-    async getTags(hash) {
-        return [];
+    getTags(hash) {
+        return this.db.getTags(hash);
     }
 }
 

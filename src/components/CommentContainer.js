@@ -15,10 +15,11 @@ class CommentContainer extends React.Component{
 
     render() {
         const { classes } = this.props;
+        let id = 0;
         return (
             <div>
                 {this.props.comments.map(data => (
-                    <Comment className={classes.snackbar} key={data.id} message={data.text}/>
+                    <Comment className={classes.snackbar} key={id++} message={data}/>
                 ))}
                 <TextInput onClick={this.props.onClick}/>
             </div>

@@ -27,21 +27,10 @@ class ChipsArray extends React.Component {
         return (
             <Paper className={classes.root}>
                 {this.props.tags.map(data => {
-                    let avatar = null;
-
-                    if (data.label === 'React') {
-                        avatar = (
-                            <Avatar>
-                                <TagFacesIcon className={classes.svgIcon} />
-                            </Avatar>
-                        );
-                    }
-
                     return (
                         <Chip
-                            key={data.key}
-                            avatar={avatar}
-                            label={data.label}
+                            key={data}
+                            label={data}
                             //onClick={this.handleDelete(data)}
                             className={classes.chip}
                         />

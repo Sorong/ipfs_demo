@@ -59,61 +59,76 @@ const styles = theme => ({
 
 class ResponsiveDrawer extends React.Component {
     database = Database;
-    mediumService = new MediaService(this.database);
+    mediaService = new MediaService(this.database);
     tagCommentService = new TagCommentService(this.database);
     state = {
         thumbnails: [],
-        medium: this.mediumService.getDummy(),
+        medium: this.mediaService.getDummy(),
         comments: [],
         tags: [],
         mobileOpen: false,
     };
 
-    //'http://localhost:3001/static/media/dummy1.d7171ce0.jpg';
-
     constructor(props) {
         super(props);
-        //this.showMore();
         this.mediumChanged = this.mediumChanged.bind(this);
         this.addComment = this.addComment.bind(this);
         this.addTag = this.addTag.bind(this);
         this.search = this.search.bind(this);
         this.showMore = this.showMore.bind(this);
         this.upload = this.upload.bind(this);
+        setTimeout(() => {
+            this.showMore();
+        }, 1000)
+    }
+    init() {
+        if(!this.db.isReady()){
+            setTimeout(() => {
+                this.init();
+            }, 1000)
+        }
+        this.showMore();
     }
 
-    uploadFile = async (files) => {
-        try {
-            this.mediumService.putMedium(files[0]).then(m => {this.upload(m)});
-        } catch (e) {
-            console.warn("Upload failed.");
-        }
+    uploadFile = (files) => {
+        this.mediaService.postFile(files[0]).then((m => {
+            this.upload(m);
+
+        }));
     };
 
     addTag = (tag) => {
-        this.tagCommentService.putComment(this.state.medium.url, tag);
-        this.state.tags.push({key: "", label: tag});
-        this.setState({
-            tags: this.state.tags
-        })
+        this.tagCommentService.putTag(this.state.medium.hash, tag).then(() =>
+            this.tagCommentService.getTags(this.state.medium.hash).then(t => {
+                    this.setState({
+                        tags: t
+                    })
+                }
+            )
+        )
     };
 
     addComment = (comment) => {
-        this.tagCommentService.putComment(this.state.medium.url, comment);
-        this.state.comments.push({text: comment});
-        this.setState({
-            comments: this.state.comments
-        })
+        this.tagCommentService.putComment(this.state.medium.hash, comment).then(() =>
+            this.tagCommentService.getComments(this.state.medium.hash).then(c => {
+                    this.setState({
+                        comments: c
+                    })
+                }
+            )
+        )
     };
 
     upload = (medium) => {
-        if(medium === undefined) {
+        if (medium === undefined) {
             return;
         }
-        this.mediumChanged(medium);
-        this.state.thumbnails.unshift(medium);
-        this.setState({
-            thumbnails: this.state.thumbnails
+        this.mediaService.getMedium(medium.hash).then(m => {
+            this.mediumChanged(m);
+            this.state.thumbnails.unshift(m);
+            this.setState({
+                thumbnails: this.state.thumbnails
+            });
         });
     };
 
@@ -124,33 +139,37 @@ class ResponsiveDrawer extends React.Component {
             tags: [],
         }));
 
-        this.mediumService.getMedium(medium.hash).then(m => {
-            this.tagCommentService.getComments(m).then(c =>  {
-                this.tagCommentService.getTags(m).then(t => {
-                    this.setState(() => ({
-                            medium : m,
-                            comments: c,
-                            tags: t
-                        })
-                    )
-                })
+        this.tagCommentService.getComments(medium.hash).then(c => {
+            this.tagCommentService.getTags(medium.hash).then(t => {
+                this.setState(() => ({
+                        comments: c,
+                        tags: t
+                    })
+                )
             })
-        });
+        })
     };
 
     showMore = () => {
-        this.mediumService.getMediumList().then((images => {
-                this.setState(() => ({
-                    thumbnails: images
-                }));
-            })
-        )
-
+        this.setState(() => ({
+            medium: this.mediaService.getDummy(),
+            thumbnails: [],
+            comments: [],
+            tags: [],
+        }));
+        this.mediaService.getMediumList().then(t => {
+            this.setState(() => ({
+                thumbnails: t
+            }));
+            if(t.length > 0) {
+                this.mediumChanged(t[0]);
+            }
+        });
     };
 
     search = (tag) => {
         console.log("search " + tag);
-        this.mediumService.getMediumList(tag.trim().toLowerCase()).then((images => {
+        this.mediaService.getMediumList(tag.trim().toLowerCase()).then((images => {
             this.setState(() => ({
                 thumbnails: images,
                 medium: images.length > 0 ? images[0] : this.state.medium

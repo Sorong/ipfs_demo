@@ -1,80 +1,70 @@
-var buffer = require('buffer/').Buffer
+var buffer = require('buffer/').Buffer;
 
 class MediaService {
     constructor(db) {
         this.db = db;
     }
+
     getDummy() {
         return dummy;
     }
 
-    async getMedium(hash) {
-        return await this.db.getSpecific(hash);
+    getMedium(hash) {
+        return this.db.getSpecific(hash).then(m => {
+            return this._convertIPFSFile(m)
+        });
     }
 
-    async getMediumList(tag = '', limit = -1) {
-        //return this.db.get(tag);
-        if (tag !== '') {
-            return await this.db.getLast(limit);
-        }
-        return await this.db.getLast(limit);
+    getMediumList(tag = '', limit = -1) {
+        let items = [];
+        return this.db.getLast(tag, limit).then(data => {
+            data.forEach(item => {
+                items.push(this.getMedium(item));
+            });
+            return Promise.all(items);
+        });
     }
 
     async getFiltered(tag, limit = -1) {
 
     }
 
-    async putMedium(medium) {
-        await this._storeFile(medium).then(() => {console.log("Medium added")});
-
-        return await this._addTemp(medium);
-        //return this.db.add(medium);
-    }
-
-    async _addTemp(medium) {
+    postFile(file) {
         let reader = new FileReader();
-        return new Promise((resolve, reject) => {
+        let m = new Promise((resolve, reject) => {
             reader.onerror = () => {
                 reader.abort();
                 reject(new DOMException("Problem parsing input file."));
             };
 
             reader.onload = () => {
-                resolve({
-                    content: reader.result,
-                    hash: medium.hash,
-                    path: medium.name,
-                    type: medium.type,
-                    width: "100%"
-
-                });
+                resolve(buffer.from(reader.result));
             };
-            reader.readAsDataURL(medium);
-        });
+            reader.readAsArrayBuffer(file)
+        }).then((b => {
+            return this.db.postFile([b], file);
+        }));
+        return m;
     }
 
-
-    async _storeFile(medium) {
-        let reader = new FileReader();
+    _convertIPFSFile(file) {
         return new Promise((resolve, reject) => {
-            reader.onerror = () => {
-                reader.abort();
-                reject(new DOMException("Problem parsing input file."));
-            };
-
-            reader.onload = () => {
-                this.db.addMedium([medium]);
-                resolve({
-                    content: buffer.from(reader.result),
-                    hash: medium.hash,
-                    path: medium.name,
-                    type: medium.type,
-                    width: "100%"
-                });
-
-            };
-            reader.readAsArrayBuffer(medium);
-        });
+                let blob = new Blob([file.content], {type: file.type});
+                let reader = new FileReader();
+                reader.onload = () => {
+                    resolve({
+                        content: reader.result,
+                        hash: file.hash,
+                        path: file.path,
+                        type: file.type,
+                        width: "100%"
+                    })
+                };
+                reader.readAsDataURL(blob);
+            }
+        ).then(m => {
+            return m;
+        })
     }
 }
 
