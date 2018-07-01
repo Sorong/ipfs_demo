@@ -11,29 +11,12 @@ const ipfsOptions = {
     start: true,
     config: {
         Addresses: {
-            Swarm: [
-                // Use IPFS dev signal server
-                // Prefer websocket over webrtc
-                //
-                // Websocket:
-                // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
-                //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf',
-                // Local signal server
-                //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star',
-                '/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf',
-                //
-                // WebRTC:
-                //'/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
-                //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-                //'/dns4/star-signal.cloud.ipfs.team/tcp/443/wss/p2p-webrtc-star/'
-                // Local signal server
-                // '/ip4/127.0.0.1/tcp/1337/ws/p2p-webrtc-star'
-            ]
-        }, libp2p: {
-            modules: {
-                transport: [wstar],
-                discovery: [wstar.discovery]
-            }
+            Swarm: ['/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star']
+        }
+    }, libp2p: {
+        modules: {
+            transport : [wstar],
+            discovery : [wstar.discovery]
         }
     }
 };
@@ -81,9 +64,10 @@ class Database {
             () => {
                 console.log('Node started!');
                 //Node Rechner: QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf
-                this.ipfs.swarm.connect('/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf')
+                //Node Laptop: QmdiX3ja8z9myZdj11DwCk1Kn1aWsLYvPEFvEgcwmRJ8uq
+                this.ipfs.swarm.connect('/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmdiX3ja8z9myZdj11DwCk1Kn1aWsLYvPEFvEgcwmRJ8uq')
                     .then(() => {
-                        console.log(`Successfully connected to peer.`)
+                        console.log(`Successfully connected to peer.`);
                         this.ipfs.swarm.peers(function (err, peerInfos) {
                             if (err) {
                                 throw err
