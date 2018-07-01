@@ -9,33 +9,6 @@ const ipfsOptions = {
         pubsub: true
     },
     start: true,
-    config: {
-        Addresses: {
-            Swarm: [
-                // Use IPFS dev signal server
-                // Prefer websocket over webrtc
-                //
-                // Websocket:
-                // '/dns4/ws-star-signal-2.servep2p.com/tcp/443//wss/p2p-websocket-star',
-                //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf',
-                // Local signal server
-                //'/ip4/127.0.0.1/tcp/4711/ws/p2p-websocket-star',
-                //'/ip4/127.0.0.1/tcp/9999/ws/ipfs/QmPos19Sy5j8S7XA7an7WqocvHpVECW9uvEdPE28DV76Kf',
-                //
-                // WebRTC:
-                //'/dns4/star-signal.cloud.ipfs.team/wss/p2p-webrtc-star',
-                //'/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-                //'/dns4/star-signal.cloud.ipfs.team/tcp/443/wss/p2p-webrtc-star/'
-                // Local signal server
-                // '/ip4/127.0.0.1/tcp/1337/ws/p2p-webrtc-star'
-            ]
-        }, libp2p: {
-            modules: {
-                transport: [wstar],
-                discovery: [wstar.discovery]
-            }
-        }
-    }
 };
 
 class Database {
@@ -53,17 +26,14 @@ class Database {
 
     init() {
         this.ipfs = new IPFS(ipfsOptions);
-        //this.daemon = ipfsAPI('localhost', '5001');
 
         this.ipfs.on('ready', async () => {
             this.orbitdb = new OrbitDB(this.ipfs);
 
             this.repostLog = await this.orbitdb.kvstore('repost');
-            //await this.repostLog.drop();
             await this.repostLog.load();
 
             this.mediaLog = await  this.orbitdb.log('media');
-            //await this.mediaLog.drop();
             await this.mediaLog.load();
 
             // Listen for updates from peers
