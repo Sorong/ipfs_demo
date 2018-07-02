@@ -98,7 +98,7 @@ class ResponsiveDrawer extends React.Component {
     };
 
     addTag = (tag) => {
-        this.tagCommentService.putTag(this.state.medium.hash, tag).then(() =>
+        this.tagCommentService.putTag(this.state.medium.hash, tag.trim()).then(() =>
             this.tagCommentService.getTags(this.state.medium.hash).then(t => {
                     this.setState({
                         tags: t
@@ -170,7 +170,7 @@ class ResponsiveDrawer extends React.Component {
 
     search = (tag) => {
         console.log("search " + tag);
-        this.mediaService.getMediumList(tag.trim().toLowerCase()).then((images => {
+        this.mediaService.getMediumList(tag.trim()).then((images => {
             this.setState(() => ({
                 thumbnails: images,
                 medium: images.length > 0 ? images[0] : this.state.medium
